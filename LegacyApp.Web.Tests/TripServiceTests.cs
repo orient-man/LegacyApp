@@ -15,11 +15,16 @@ namespace LegacyApp.Web.Tests
         private static User loggedInUser;
         private TripService tripService;
 
+        [SetUp]
+        public void SetUpEachTest()
+        {
+            tripService = new TestableTripService();
+        }
+
         [Test, ExpectedException(typeof (UserNotLoggedInException))]
         public void ShouldThrowAnExceptionWhenNotLoggedIn()
         {
             // arrange
-            tripService = new TestableTripService();
             loggedInUser = Guest;
 
             // act
@@ -30,7 +35,6 @@ namespace LegacyApp.Web.Tests
         public void ShouldNotReturnAnyTripsWhenUsersAreNotFriends()
         {
             // arrange
-            tripService = new TestableTripService();
             loggedInUser = RegisteredUser;
             var friend = new User();
             friend.Friends.Add(AnotherUser);
