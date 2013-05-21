@@ -24,7 +24,7 @@ Start testing from shortest do deepest branch
 
     git clone https://github.com/orient-man/LegacyApp.git
     cd LegacyApp
-    git checkout aee8744
+    git checkout 6c63c87
 
 ## Notes before 1st test
 
@@ -40,4 +40,15 @@ Start testing from shortest do deepest branch
  * introducing a seam into the code (to avoid HttpContext)
  * code coverage shows if test covers the branch I wanted
  * refactoring test
- 
+
+## Next: "ShouldNotReturnAnyTripsWhenUsersAreNotFriends"
+
+ * Before: a77bee4
+ * After: 0f45a17
+
+## Next: "ShouldReturnFriendTripsWhenUsersAreFriends"
+
+ * PLEASE DONT COPY-AND-PASTE NEVER EVER
+ * avoid going to database (TripDao)
+ * another example of seam: escaping singleton, static calls and object creation
+ * 100% coverage except seams (dependecies)

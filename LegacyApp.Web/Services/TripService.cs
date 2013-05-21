@@ -25,7 +25,7 @@ namespace LegacyApp.Web.Services
 
                 if (isFriend)
                 {
-                    tripList = TripDao.FindTripsByUser(user);
+                    tripList = TripsByUser(user);
                 }
             }
             else
@@ -34,6 +34,11 @@ namespace LegacyApp.Web.Services
             }
 
             return tripList;
+        }
+
+        protected virtual List<Trip> TripsByUser(User user)
+        {
+            return TripDao.FindTripsByUser(user);
         }
 
         protected virtual User GetLoggedInUser()
