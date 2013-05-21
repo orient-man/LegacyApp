@@ -52,3 +52,4 @@ Start testing from shortest do deepest branch
  * avoid going to database (TripDao)
  * another example of seam: escaping singleton, static calls and object creation
  * 100% coverage except seams (dependecies)
+ * builders (when we need to build rich object graph)

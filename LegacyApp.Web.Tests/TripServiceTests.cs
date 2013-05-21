@@ -38,9 +38,10 @@ namespace LegacyApp.Web.Tests
         public void ShouldNotReturnAnyTripsWhenUsersAreNotFriends()
         {
             // arrange
-            var friend = new User();
-            friend.Friends.Add(AnotherUser);
-            friend.Trips.Add(ToBrazil);
+            var friend = new UserBuilder()
+                .FriendsWith(AnotherUser)
+                .WithTrips(ToBrazil)
+                .Build();
 
             // act
             var friendTrips = tripService.GetTripsByUser(friend);
@@ -53,11 +54,10 @@ namespace LegacyApp.Web.Tests
         public void ShouldReturnFriendTripsWhenUsersAreFriends()
         {
             // arrange
-            var friend = new User();
-            friend.Friends.Add(AnotherUser);
-            friend.Friends.Add(loggedInUser);
-            friend.Trips.Add(ToBrazil);
-            friend.Trips.Add(ToLondon);
+            var friend = new UserBuilder()
+                .FriendsWith(AnotherUser, loggedInUser)
+                .WithTrips(ToBrazil, ToLondon)
+                .Build();
 
             // act
             var friendTrips = tripService.GetTripsByUser(friend);
