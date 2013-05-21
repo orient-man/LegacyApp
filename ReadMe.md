@@ -35,6 +35,9 @@ Start testing from shortest do deepest branch
 
 ## First test for shortest branch
 
+ * ShouldThrowAnExceptionWhenNotLoggedIn
  * Ctrl-Shift-R / Ctrl-R Ctrl-M - Extract Method "GetLoggedInUser"
  * introducing a seam into the code (to avoid HttpContext)
+ * code coverage shows if test covers the branch I wanted
+ * refactoring test
  
