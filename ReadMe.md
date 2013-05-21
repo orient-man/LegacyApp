@@ -19,3 +19,9 @@ Start testing from shortest do deepest branch
 
  * because getting to deepest requires big setup i.e. sample data, mocks, fakes etc.)
  * allows to understand better the code
+
+## Demo - HOWTO obtain the code
+
+    git clone https://github.com/orient-man/LegacyApp.git
+	cd LegacyApp
+    git checkout aee8744
