@@ -20,6 +20,7 @@ namespace LegacyApp.Web.Tests
         [SetUp]
         public void SetUpEachTest()
         {
+            loggedInUser = RegisteredUser;
             tripService = new TestableTripService();
         }
 
@@ -37,7 +38,6 @@ namespace LegacyApp.Web.Tests
         public void ShouldNotReturnAnyTripsWhenUsersAreNotFriends()
         {
             // arrange
-            loggedInUser = RegisteredUser;
             var friend = new User();
             friend.Friends.Add(AnotherUser);
             friend.Trips.Add(ToBrazil);
@@ -53,7 +53,6 @@ namespace LegacyApp.Web.Tests
         public void ShouldReturnFriendTripsWhenUsersAreFriends()
         {
             // arrange
-            loggedInUser = RegisteredUser;
             var friend = new User();
             friend.Friends.Add(AnotherUser);
             friend.Friends.Add(loggedInUser);
