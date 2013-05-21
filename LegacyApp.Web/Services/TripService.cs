@@ -12,11 +12,7 @@ namespace LegacyApp.Web.Services
             User loggedUser = null;
             bool isFriend = false;
 
-            if (HttpContext.Current.Request.IsAuthenticated)
-            {
-                loggedUser = UserDao.GetByName(
-                    HttpContext.Current.User.Identity.Name);
-            }
+            loggedUser = GetLoggedInUser(loggedUser);
 
             if (loggedUser != null)
             {
@@ -40,6 +36,16 @@ namespace LegacyApp.Web.Services
             }
 
             return tripList;
+        }
+
+        protected virtual User GetLoggedInUser(User loggedUser)
+        {
+            if (HttpContext.Current.Request.IsAuthenticated)
+            {
+                loggedUser = UserDao.GetByName(
+                    HttpContext.Current.User.Identity.Name);
+            }
+            return loggedUser;
         }
     }
 }

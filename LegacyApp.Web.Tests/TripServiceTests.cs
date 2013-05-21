@@ -6,14 +6,22 @@ namespace LegacyApp.Web.Tests
     [TestFixture]
     public class TripServiceTests
     {
-        [Ignore, Test, ExpectedException(typeof (UserNotLoggedInException))]
+        [Test, ExpectedException(typeof (UserNotLoggedInException))]
         public void ShouldThrowAnExceptionWhenNotLoggedIn()
         {
             // arrange
-            TripService tripService = new TripService();
+            TripService tripService = new TestableTripService();
 
             // act
             tripService.GetTripsByUser(null);
+        }
+
+        private class TestableTripService : TripService
+        {
+            protected override Models.User GetLoggedInUser(Models.User loggedUser)
+            {
+                return null;
+            }
         }
     }
 }

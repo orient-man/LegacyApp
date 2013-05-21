@@ -23,5 +23,18 @@ Start testing from shortest do deepest branch
 ## Demo - HOWTO obtain the code
 
     git clone https://github.com/orient-man/LegacyApp.git
-	cd LegacyApp
+    cd LegacyApp
     git checkout aee8744
+
+## Notes before 1st test
+
+ * tip: split screen
+ * `Install-Package nunit -ProjectName LegacyApp.Web.Tests`
+ * snippets for test class / method
+ * NCrunch
+
+## First test for shortest branch
+
+ * Ctrl-Shift-R / Ctrl-R Ctrl-M - Extract Method "GetLoggedInUser"
+ * introducing a seam into the code (to avoid HttpContext)
+ 
