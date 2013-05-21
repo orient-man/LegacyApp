@@ -8,10 +8,13 @@ namespace LegacyApp.Web.Models
 
         public List<User> Friends { get; set; }
 
+        public List<Trip> Trips { get; set; }
+
         public User()
         {
             Name = "";
             Friends = new List<User>();
+            Trips = new List<Trip>();
         }
 
         public override bool Equals(object obj)
