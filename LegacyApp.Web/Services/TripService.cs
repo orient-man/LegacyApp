@@ -9,11 +9,9 @@ namespace LegacyApp.Web.Services
         public List<Trip> GetTripsByUser(User user)
         {
             List<Trip> tripList = new List<Trip>();
-            User loggedUser = null;
             bool isFriend = false;
 
-            loggedUser = GetLoggedInUser(loggedUser);
-
+            var loggedUser = GetLoggedInUser();
             if (loggedUser != null)
             {
                 foreach (User friend in user.Friends)
@@ -38,8 +36,9 @@ namespace LegacyApp.Web.Services
             return tripList;
         }
 
-        protected virtual User GetLoggedInUser(User loggedUser)
+        protected virtual User GetLoggedInUser()
         {
+            User loggedUser = null;
             if (HttpContext.Current.Request.IsAuthenticated)
             {
                 loggedUser = UserDao.GetByName(

@@ -7,9 +7,9 @@ namespace LegacyApp.Web.Tests
     [TestFixture]
     public class TripServiceTests
     {
-        private const User Guest = null;
-        private const User UnusedUser = null;
-        private User loggedInUser;
+        private readonly User Guest = null;
+        private readonly User UnusedUser = null;
+        private static User loggedInUser;
 
         [Test, ExpectedException(typeof (UserNotLoggedInException))]
         public void ShouldThrowAnExceptionWhenNotLoggedIn()
@@ -24,9 +24,9 @@ namespace LegacyApp.Web.Tests
 
         private class TestableTripService : TripService
         {
-            protected override User GetLoggedInUser(User loggedUser)
+            protected override User GetLoggedInUser()
             {
-                return loggedUser;
+                return loggedInUser;
             }
         }
     }
