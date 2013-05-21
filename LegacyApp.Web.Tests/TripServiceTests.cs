@@ -7,11 +7,11 @@ namespace LegacyApp.Web.Tests
     [TestFixture]
     public class TripServiceTests
     {
-        private readonly User Guest = null;
-        private readonly User UnusedUser = null;
-        private readonly User RegisteredUser = new User { Name = "Alice" };
-        private readonly User AnotherUser = new User { Name = "Bob" };
-        private readonly Trip ToBrazil = new Trip();
+        private static readonly User Guest = null;
+        private static readonly User UnusedUser = null;
+        private static readonly User RegisteredUser = new User { Name = "Alice" };
+        private static readonly User AnotherUser = new User { Name = "Bob" };
+        private static readonly Trip ToBrazil = new Trip();
         private static User loggedInUser;
         private TripService tripService;
 
