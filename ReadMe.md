@@ -18,7 +18,7 @@ Imagine a social networking website for travellers
 Start testing from shortest do deepest branch
 
  * because getting to deepest requires big setup i.e. sample data, mocks, fakes etc.)
- * allows to understand better the code
+ * allows to understand better what the code does
 
 ## Demo - HOWTO obtain the code
 
@@ -31,15 +31,17 @@ Start testing from shortest do deepest branch
  * tip: split screen
  * `Install-Package nunit -ProjectName LegacyApp.Web.Tests`
  * snippets for test class / method
- * NCrunch
+ * NCrunch / Resharper
 
 ## First test for shortest branch
 
+ * Before: 6c63c87
  * ShouldThrowAnExceptionWhenNotLoggedIn
  * Ctrl-Shift-R / Ctrl-R Ctrl-M - Extract Method "GetLoggedInUser"
  * introducing a seam into the code (to avoid HttpContext)
  * code coverage shows if test covers the branch I wanted
  * refactoring test
+ * After: a77bee4
 
 ## Next: "ShouldNotReturnAnyTripsWhenUsersAreNotFriends"
 
@@ -48,15 +50,18 @@ Start testing from shortest do deepest branch
 
 ## Next: "ShouldReturnFriendTripsWhenUsersAreFriends"
 
- * PLEASE DONT COPY-AND-PASTE NEVER EVER
+ * Before: 0f45a17
+ * PLEASE DO NOT COPY-AND-PASTE NEVER EVER
  * avoid going to database (TripDao)
  * another example of seam: escaping singleton, static calls and object creation
  * 100% coverage except seams (dependecies)
  * builders (when we need to build rich object graph)
+ * After: ?
 
 ## Refactoring begins
 
- * Starting from the deepest branch to the shortest (different than testing)
+Starting from the deepest branch to the shortest (different than testing)
+
  * method does too much (feature envy)
  * Single Responsibility Principle!
  * Tip for Mac keyboard: Alt+Insert == fn + alt/option + return
@@ -79,3 +84,21 @@ Start testing from shortest do deepest branch
  * interface segregation
  * service locator pattern and mocking dependecies
  * get rid of Testable... (ugly) - protected virtual methods only for tests
+ * compare before and after - it could take 20 minutes (after some practice ;)
+
+## Craftsmen at work
+
+ * Write readable and maintainable code
+  - code must express business rules
+ * Strive for simplicity
+ * Know your tools well (i.e. frameworks, editor)
+ * Work in small and safe increments
+  - commit often
+ * Embrace change, be brave
+ * Boy scout rule / No broken windows
+
+# Links
+
+ * [Working Effectively with Legacy Code](http://www.amazon.com/Working-Effectively-Legacy-Michael-Feathers/dp/0131177052)
+ * [Refactoring: Improving the Design of Existing Code](http://www.amazon.com/Refactoring-Improving-Design-Existing-Code/dp/0201485672/)
+ * [Original talk video (Java)](http://www.youtube.com/watch?v=_NnElPO5BU0)
