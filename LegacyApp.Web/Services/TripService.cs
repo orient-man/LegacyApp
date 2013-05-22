@@ -17,12 +17,17 @@ namespace LegacyApp.Web.Services
 
         public List<Trip> GetFriendTrips(User friend, User loggedInUser)
         {
-            if (loggedInUser == null)
-                throw new UserNotLoggedInException();
+            Validate(loggedInUser);
 
             return friend.IsFriendWith(loggedInUser)
                 ? TripsByUser(friend)
                 : NotTrips();
+        }
+
+        private void Validate(User loggedInUser)
+        {
+            if (loggedInUser == null)
+                throw new UserNotLoggedInException();
         }
 
         private List<Trip> TripsByUser(User user)
