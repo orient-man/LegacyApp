@@ -1,0 +1,129 @@
+diff --git a/LegacyApp.Web.Tests/LegacyApp.Web.Tests.csproj b/LegacyApp.Web.Tests/LegacyApp.Web.Tests.csproj
+index f0c0000..9b697b6 100644
+--- a/LegacyApp.Web.Tests/LegacyApp.Web.Tests.csproj
++++ b/LegacyApp.Web.Tests/LegacyApp.Web.Tests.csproj
+@@ -37,6 +37,9 @@
+   <ItemGroup>
+     <Reference Include="Microsoft.CSharp" />
+     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
++    <Reference Include="Moq">
++      <HintPath>..\packages\Moq.4.0.10827\lib\NET40\Moq.dll</HintPath>
++    </Reference>
+     <Reference Include="nunit.framework">
+       <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
+     </Reference>
+@@ -103,6 +106,7 @@
+   </ItemGroup>
+   <ItemGroup>
+     <Compile Include="Properties\AssemblyInfo.cs" />
++    <Compile Include="TripServiceTests.cs" />
+   </ItemGroup>
+   <ItemGroup>
+     <Content Include="App.config" />
+diff --git a/LegacyApp.Web.Tests/TripServiceTests.cs b/LegacyApp.Web.Tests/TripServiceTests.cs
+new file mode 100644
+index 0000000..e7bfa69
+--- /dev/null
++++ b/LegacyApp.Web.Tests/TripServiceTests.cs
+@@ -0,0 +1,33 @@
++﻿using LegacyApp.Web.Models;
++using NUnit.Framework;
++using LegacyApp.Web.Services;
++
++namespace LegacyApp.Web.Tests
++{
++    [TestFixture]
++    public class TripServiceTests
++    {
++        private readonly User Guest = null;
++        private readonly User UnusedUser = null;
++        private static User loggedInUser;
++
++        [Test, ExpectedException(typeof (UserNotLoggedInException))]
++        public void ShouldThrowAnExceptionWhenNotLoggedIn()
++        {
++            // arrange
++            TripService tripService = new TestableTripService();
++            loggedInUser = Guest;
++
++            // act
++            tripService.GetTripsByUser(UnusedUser);
++        }
++
++        private class TestableTripService : TripService
++        {
++            protected override User GetLoggedInUser()
++            {
++                return loggedInUser;
++            }
++        }
++    }
++}
+\ No newline at end of file
+diff --git a/LegacyApp.Web/Services/TripService.cs b/LegacyApp.Web/Services/TripService.cs
+index 09cfdd8..a47be57 100644
+--- a/LegacyApp.Web/Services/TripService.cs
++++ b/LegacyApp.Web/Services/TripService.cs
+@@ -9,15 +9,9 @@ namespace LegacyApp.Web.Services
+         public List<Trip> GetTripsByUser(User user)
+         {
+             List<Trip> tripList = new List<Trip>();
+-            User loggedUser = null;
+             bool isFriend = false;
+ 
+-            if (HttpContext.Current.Request.IsAuthenticated)
+-            {
+-                loggedUser = UserDao.GetByName(
+-                    HttpContext.Current.User.Identity.Name);
+-            }
+-
++            var loggedUser = GetLoggedInUser();
+             if (loggedUser != null)
+             {
+                 foreach (User friend in user.Friends)
+@@ -41,5 +35,16 @@ namespace LegacyApp.Web.Services
+ 
+             return tripList;
+         }
++
++        protected virtual User GetLoggedInUser()
++        {
++            User loggedUser = null;
++            if (HttpContext.Current.Request.IsAuthenticated)
++            {
++                loggedUser = UserDao.GetByName(
++                    HttpContext.Current.User.Identity.Name);
++            }
++            return loggedUser;
++        }
+     }
+ }
+\ No newline at end of file
+diff --git a/ReadMe.md b/ReadMe.md
+index 4d7b5b3..0158924 100644
+--- a/ReadMe.md
++++ b/ReadMe.md
+@@ -23,5 +23,21 @@ Start testing from shortest do deepest branch
+ ## Demo - HOWTO obtain the code
+ 
+     git clone https://github.com/orient-man/LegacyApp.git
+-	cd LegacyApp
++    cd LegacyApp
+     git checkout aee8744
++
++## Notes before 1st test
++
++ * tip: split screen
++ * `Install-Package nunit -ProjectName LegacyApp.Web.Tests`
++ * snippets for test class / method
++ * NCrunch
++
++## First test for shortest branch
++
++ * ShouldThrowAnExceptionWhenNotLoggedIn
++ * Ctrl-Shift-R / Ctrl-R Ctrl-M - Extract Method "GetLoggedInUser"
++ * introducing a seam into the code (to avoid HttpContext)
++ * code coverage shows if test covers the branch I wanted
++ * refactoring test
++ 
+\ No newline at end of file

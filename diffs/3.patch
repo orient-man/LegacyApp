@@ -1,0 +1,183 @@
+diff --git a/LegacyApp.Web.Tests/LegacyApp.Web.Tests.csproj b/LegacyApp.Web.Tests/LegacyApp.Web.Tests.csproj
+index 9b697b6..41e2398 100644
+--- a/LegacyApp.Web.Tests/LegacyApp.Web.Tests.csproj
++++ b/LegacyApp.Web.Tests/LegacyApp.Web.Tests.csproj
+@@ -107,6 +107,7 @@
+   <ItemGroup>
+     <Compile Include="Properties\AssemblyInfo.cs" />
+     <Compile Include="TripServiceTests.cs" />
++    <Compile Include="UserBuilder.cs" />
+   </ItemGroup>
+   <ItemGroup>
+     <Content Include="App.config" />
+diff --git a/LegacyApp.Web.Tests/TripServiceTests.cs b/LegacyApp.Web.Tests/TripServiceTests.cs
+index c6a24d6..e0e762f 100644
+--- a/LegacyApp.Web.Tests/TripServiceTests.cs
++++ b/LegacyApp.Web.Tests/TripServiceTests.cs
+@@ -1,4 +1,5 @@
+-﻿using LegacyApp.Web.Models;
++﻿using System.Collections.Generic;
++using LegacyApp.Web.Models;
+ using NUnit.Framework;
+ using LegacyApp.Web.Services;
+ 
+@@ -12,12 +13,14 @@ namespace LegacyApp.Web.Tests
+         private static readonly User RegisteredUser = new User { Name = "Alice" };
+         private static readonly User AnotherUser = new User { Name = "Bob" };
+         private static readonly Trip ToBrazil = new Trip();
++        private static readonly Trip ToLondon = new Trip();
+         private static User loggedInUser;
+         private TripService tripService;
+ 
+         [SetUp]
+         public void SetUpEachTest()
+         {
++            loggedInUser = RegisteredUser;
+             tripService = new TestableTripService();
+         }
+ 
+@@ -35,10 +38,10 @@ namespace LegacyApp.Web.Tests
+         public void ShouldNotReturnAnyTripsWhenUsersAreNotFriends()
+         {
+             // arrange
+-            loggedInUser = RegisteredUser;
+-            var friend = new User();
+-            friend.Friends.Add(AnotherUser);
+-            friend.Trips.Add(ToBrazil);
++            var friend = new UserBuilder()
++                .FriendsWith(AnotherUser)
++                .WithTrips(ToBrazil)
++                .Build();
+ 
+             // act
+             var friendTrips = tripService.GetTripsByUser(friend);
+@@ -47,12 +50,33 @@ namespace LegacyApp.Web.Tests
+             Assert.That(friendTrips, Is.Empty);
+         }
+ 
++        [Test]
++        public void ShouldReturnFriendTripsWhenUsersAreFriends()
++        {
++            // arrange
++            var friend = new UserBuilder()
++                .FriendsWith(AnotherUser, loggedInUser)
++                .WithTrips(ToBrazil, ToLondon)
++                .Build();
++
++            // act
++            var friendTrips = tripService.GetTripsByUser(friend);
++
++            // assert
++            Assert.That(friendTrips.Count, Is.EqualTo(2));
++        }
++
+         private class TestableTripService : TripService
+         {
+             protected override User GetLoggedInUser()
+             {
+                 return loggedInUser;
+             }
++
++            protected override List<Trip> TripsByUser(User user)
++            {
++                return user.Trips;
++            }
+         }
+     }
+ }
+\ No newline at end of file
+diff --git a/LegacyApp.Web.Tests/UserBuilder.cs b/LegacyApp.Web.Tests/UserBuilder.cs
+new file mode 100644
+index 0000000..a722e08
+--- /dev/null
++++ b/LegacyApp.Web.Tests/UserBuilder.cs
+@@ -0,0 +1,31 @@
++﻿using LegacyApp.Web.Models;
++
++namespace LegacyApp.Web.Tests
++{
++    public class UserBuilder
++    {
++        private readonly User user = new User();
++
++        public UserBuilder()
++        {
++            user.Name = new object().GetHashCode().ToString();
++        }
++
++        public UserBuilder FriendsWith(params User[] friends)
++        {
++            user.Friends.AddRange(friends);
++            return this;
++        }
++
++        public UserBuilder WithTrips(params Trip[] trips)
++        {
++            user.Trips.AddRange(trips);
++            return this;
++        }
++
++        public User Build()
++        {
++            return user;
++        }
++    }
++}
+\ No newline at end of file
+diff --git a/LegacyApp.Web/Services/TripService.cs b/LegacyApp.Web/Services/TripService.cs
+index a47be57..ddac998 100644
+--- a/LegacyApp.Web/Services/TripService.cs
++++ b/LegacyApp.Web/Services/TripService.cs
+@@ -25,7 +25,7 @@ namespace LegacyApp.Web.Services
+ 
+                 if (isFriend)
+                 {
+-                    tripList = TripDao.FindTripsByUser(user);
++                    tripList = TripsByUser(user);
+                 }
+             }
+             else
+@@ -36,6 +36,11 @@ namespace LegacyApp.Web.Services
+             return tripList;
+         }
+ 
++        protected virtual List<Trip> TripsByUser(User user)
++        {
++            return TripDao.FindTripsByUser(user);
++        }
++
+         protected virtual User GetLoggedInUser()
+         {
+             User loggedUser = null;
+diff --git a/ReadMe.md b/ReadMe.md
+index 0158924..f06507d 100644
+--- a/ReadMe.md
++++ b/ReadMe.md
+@@ -24,7 +24,7 @@ Start testing from shortest do deepest branch
+ 
+     git clone https://github.com/orient-man/LegacyApp.git
+     cd LegacyApp
+-    git checkout aee8744
++    git checkout 6c63c87
+ 
+ ## Notes before 1st test
+ 
+@@ -40,4 +40,16 @@ Start testing from shortest do deepest branch
+  * introducing a seam into the code (to avoid HttpContext)
+  * code coverage shows if test covers the branch I wanted
+  * refactoring test
+- 
+\ No newline at end of file
++
++## Next: "ShouldNotReturnAnyTripsWhenUsersAreNotFriends"
++
++ * Before: a77bee4
++ * After: 0f45a17
++
++## Next: "ShouldReturnFriendTripsWhenUsersAreFriends"
++
++ * PLEASE DONT COPY-AND-PASTE NEVER EVER
++ * avoid going to database (TripDao)
++ * another example of seam: escaping singleton, static calls and object creation
++ * 100% coverage except seams (dependecies)
++ * builders (when we need to build rich object graph)

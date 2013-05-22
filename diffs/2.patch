@@ -1,0 +1,54 @@
+diff --git a/LegacyApp.Web.Tests/TripServiceTests.cs b/LegacyApp.Web.Tests/TripServiceTests.cs
+index e7bfa69..c6a24d6 100644
+--- a/LegacyApp.Web.Tests/TripServiceTests.cs
++++ b/LegacyApp.Web.Tests/TripServiceTests.cs
+@@ -7,21 +7,46 @@ namespace LegacyApp.Web.Tests
+     [TestFixture]
+     public class TripServiceTests
+     {
+-        private readonly User Guest = null;
+-        private readonly User UnusedUser = null;
++        private static readonly User Guest = null;
++        private static readonly User UnusedUser = null;
++        private static readonly User RegisteredUser = new User { Name = "Alice" };
++        private static readonly User AnotherUser = new User { Name = "Bob" };
++        private static readonly Trip ToBrazil = new Trip();
+         private static User loggedInUser;
++        private TripService tripService;
++
++        [SetUp]
++        public void SetUpEachTest()
++        {
++            tripService = new TestableTripService();
++        }
+ 
+         [Test, ExpectedException(typeof (UserNotLoggedInException))]
+         public void ShouldThrowAnExceptionWhenNotLoggedIn()
+         {
+             // arrange
+-            TripService tripService = new TestableTripService();
+             loggedInUser = Guest;
+ 
+             // act
+             tripService.GetTripsByUser(UnusedUser);
+         }
+ 
++        [Test]
++        public void ShouldNotReturnAnyTripsWhenUsersAreNotFriends()
++        {
++            // arrange
++            loggedInUser = RegisteredUser;
++            var friend = new User();
++            friend.Friends.Add(AnotherUser);
++            friend.Trips.Add(ToBrazil);
++
++            // act
++            var friendTrips = tripService.GetTripsByUser(friend);
++
++            // assert
++            Assert.That(friendTrips, Is.Empty);
++        }
++
+         private class TestableTripService : TripService
+         {
+             protected override User GetLoggedInUser()

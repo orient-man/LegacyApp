@@ -1,0 +1,119 @@
+diff --git a/LegacyApp.Web.Tests/TripServiceTests.cs b/LegacyApp.Web.Tests/TripServiceTests.cs
+index e0e762f..3c1c299 100644
+--- a/LegacyApp.Web.Tests/TripServiceTests.cs
++++ b/LegacyApp.Web.Tests/TripServiceTests.cs
+@@ -14,24 +14,18 @@ namespace LegacyApp.Web.Tests
+         private static readonly User AnotherUser = new User { Name = "Bob" };
+         private static readonly Trip ToBrazil = new Trip();
+         private static readonly Trip ToLondon = new Trip();
+-        private static User loggedInUser;
+         private TripService tripService;
+ 
+         [SetUp]
+         public void SetUpEachTest()
+         {
+-            loggedInUser = RegisteredUser;
+             tripService = new TestableTripService();
+         }
+ 
+         [Test, ExpectedException(typeof (UserNotLoggedInException))]
+         public void ShouldThrowAnExceptionWhenNotLoggedIn()
+         {
+-            // arrange
+-            loggedInUser = Guest;
+-
+-            // act
+-            tripService.GetTripsByUser(UnusedUser);
++            tripService.GetTripsByUser(UnusedUser, Guest);
+         }
+ 
+         [Test]
+@@ -44,7 +38,7 @@ namespace LegacyApp.Web.Tests
+                 .Build();
+ 
+             // act
+-            var friendTrips = tripService.GetTripsByUser(friend);
++            var friendTrips = tripService.GetTripsByUser(friend, RegisteredUser);
+ 
+             // assert
+             Assert.That(friendTrips, Is.Empty);
+@@ -55,12 +49,12 @@ namespace LegacyApp.Web.Tests
+         {
+             // arrange
+             var friend = new UserBuilder()
+-                .FriendsWith(AnotherUser, loggedInUser)
++                .FriendsWith(AnotherUser, RegisteredUser)
+                 .WithTrips(ToBrazil, ToLondon)
+                 .Build();
+ 
+             // act
+-            var friendTrips = tripService.GetTripsByUser(friend);
++            var friendTrips = tripService.GetTripsByUser(friend, RegisteredUser);
+ 
+             // assert
+             Assert.That(friendTrips.Count, Is.EqualTo(2));
+@@ -68,11 +62,6 @@ namespace LegacyApp.Web.Tests
+ 
+         private class TestableTripService : TripService
+         {
+-            protected override User GetLoggedInUser()
+-            {
+-                return loggedInUser;
+-            }
+-
+             protected override List<Trip> TripsByUser(User user)
+             {
+                 return user.Trips;
+diff --git a/LegacyApp.Web/Services/TripService.cs b/LegacyApp.Web/Services/TripService.cs
+index e6eda0b..a00ca9c 100644
+--- a/LegacyApp.Web/Services/TripService.cs
++++ b/LegacyApp.Web/Services/TripService.cs
+@@ -1,32 +1,20 @@
+ ﻿using System.Collections.Generic;
+-using System.Web;
+ using LegacyApp.Web.Models;
+ 
+ namespace LegacyApp.Web.Services
+ {
+     public class TripService
+     {
+-        public List<Trip> GetTripsByUser(User user)
++        public List<Trip> GetTripsByUser(User user, User loggedInUser)
+         {
+-            if (GetLoggedInUser() == null)
++            if (loggedInUser == null)
+                 throw new UserNotLoggedInException();
+ 
+-            return user.IsFriendWith(GetLoggedInUser())
++            return user.IsFriendWith(loggedInUser)
+                 ? TripsByUser(user)
+                 : NotTrips();
+         }
+ 
+-        protected virtual User GetLoggedInUser()
+-        {
+-            User loggedUser = null;
+-            if (HttpContext.Current.Request.IsAuthenticated)
+-            {
+-                loggedUser = UserDao.GetByName(
+-                    HttpContext.Current.User.Identity.Name);
+-            }
+-            return loggedUser;
+-        }
+-
+         protected virtual List<Trip> TripsByUser(User user)
+         {
+             return TripDao.FindTripsByUser(user);
+diff --git a/ReadMe.md b/ReadMe.md
+index f631b96..492d81b 100644
+--- a/ReadMe.md
++++ b/ReadMe.md
+@@ -67,4 +67,8 @@ Start testing from shortest do deepest branch
+  * guard clause to the top
+  * get rid of variables (if you can) -> they make for complexity
+  * code should be read top-down
++ * always baby steps - bit by bit
+ 
++## What if desing is wrong?
++
++ * it has dependecy on web framework

@@ -1,0 +1,135 @@
+diff --git a/LegacyApp.Web.Tests/LegacyApp.Web.Tests.csproj b/LegacyApp.Web.Tests/LegacyApp.Web.Tests.csproj
+index 41e2398..aeac08f 100644
+--- a/LegacyApp.Web.Tests/LegacyApp.Web.Tests.csproj
++++ b/LegacyApp.Web.Tests/LegacyApp.Web.Tests.csproj
+@@ -108,6 +108,7 @@
+     <Compile Include="Properties\AssemblyInfo.cs" />
+     <Compile Include="TripServiceTests.cs" />
+     <Compile Include="UserBuilder.cs" />
++    <Compile Include="UserTests.cs" />
+   </ItemGroup>
+   <ItemGroup>
+     <Content Include="App.config" />
+diff --git a/LegacyApp.Web.Tests/UserBuilder.cs b/LegacyApp.Web.Tests/UserBuilder.cs
+index a722e08..115165f 100644
+--- a/LegacyApp.Web.Tests/UserBuilder.cs
++++ b/LegacyApp.Web.Tests/UserBuilder.cs
+@@ -8,7 +8,13 @@ namespace LegacyApp.Web.Tests
+ 
+         public UserBuilder()
+         {
+-            user.Name = new object().GetHashCode().ToString();
++            Named(new object().GetHashCode().ToString());
++        }
++
++        public UserBuilder Named(string name)
++        {
++            user.Name = name;
++            return this;
+         }
+ 
+         public UserBuilder FriendsWith(params User[] friends)
+diff --git a/LegacyApp.Web.Tests/UserTests.cs b/LegacyApp.Web.Tests/UserTests.cs
+new file mode 100644
+index 0000000..500bd64
+--- /dev/null
++++ b/LegacyApp.Web.Tests/UserTests.cs
+@@ -0,0 +1,32 @@
++﻿using NUnit.Framework;
++using LegacyApp.Web.Models;
++
++namespace LegacyApp.Web.Tests
++{
++    [TestFixture]
++    public class UserTests
++    {
++        private static readonly User Bob = new UserBuilder().Named("Bob").Build();
++        private static readonly User Alice = new UserBuilder().Named("Alice").Build();
++
++        [Test]
++        public void ShouldInformWhenUsersAreNotFriends()
++        {
++            // arrange
++            var user = new UserBuilder().FriendsWith(Bob).Build();
++
++            // act & assert
++            Assert.That(user.IsFriendWith(Alice), Is.False);
++        }
++
++        [Test]
++        public void ShouldInformWhenUsersAreFriends()
++        {
++            // arrange
++            var user = new UserBuilder().FriendsWith(Bob, Alice).Build();
++
++            // act & assert
++            Assert.That(user.IsFriendWith(Alice), Is.True);
++        }
++    }
++}
+\ No newline at end of file
+diff --git a/LegacyApp.Web/Models/User.cs b/LegacyApp.Web/Models/User.cs
+index 08ebcf6..a50ff0f 100644
+--- a/LegacyApp.Web/Models/User.cs
++++ b/LegacyApp.Web/Models/User.cs
+@@ -17,6 +17,11 @@ namespace LegacyApp.Web.Models
+             Trips = new List<Trip>();
+         }
+ 
++        public bool IsFriendWith(User user)
++        {
++            return Friends.Contains(user);
++        }
++
+         public override bool Equals(object obj)
+         {
+             return obj != null && Equals(obj as User);
+diff --git a/LegacyApp.Web/Services/TripService.cs b/LegacyApp.Web/Services/TripService.cs
+index ddac998..a92ccf8 100644
+--- a/LegacyApp.Web/Services/TripService.cs
++++ b/LegacyApp.Web/Services/TripService.cs
+@@ -9,21 +9,11 @@ namespace LegacyApp.Web.Services
+         public List<Trip> GetTripsByUser(User user)
+         {
+             List<Trip> tripList = new List<Trip>();
+-            bool isFriend = false;
+ 
+-            var loggedUser = GetLoggedInUser();
+-            if (loggedUser != null)
++            var loggedInUser = GetLoggedInUser();
++            if (loggedInUser != null)
+             {
+-                foreach (User friend in user.Friends)
+-                {
+-                    if (friend.Equals(loggedUser))
+-                    {
+-                        isFriend = true;
+-                        break;
+-                    }
+-                }
+-
+-                if (isFriend)
++                if (user.IsFriendWith(loggedInUser))
+                 {
+                     tripList = TripsByUser(user);
+                 }
+diff --git a/ReadMe.md b/ReadMe.md
+index f06507d..93f3c41 100644
+--- a/ReadMe.md
++++ b/ReadMe.md
+@@ -53,3 +53,15 @@ Start testing from shortest do deepest branch
+  * another example of seam: escaping singleton, static calls and object creation
+  * 100% coverage except seams (dependecies)
+  * builders (when we need to build rich object graph)
++
++## Refactoring begins
++
++ * Starting from the deepest branch to the shortest (different than testing)
++ * method does too much (feature envy)
++ * Single Responsibility Principle!
++ * Tip for Mac keyboard: Alt+Insert == fn + alt/option + return
++ * ShouldInformWhenUsersAreNotFriends
++ * Resharper: Ctrl+Alt+F -> file structure
++ * stay green all the time!
++ * bring variables together (near usage)
++

@@ -1,0 +1,207 @@
+diff --git a/LegacyApp.Web.Tests/LegacyApp.Web.Tests.csproj b/LegacyApp.Web.Tests/LegacyApp.Web.Tests.csproj
+index aeac08f..f3e7307 100644
+--- a/LegacyApp.Web.Tests/LegacyApp.Web.Tests.csproj
++++ b/LegacyApp.Web.Tests/LegacyApp.Web.Tests.csproj
+@@ -40,6 +40,9 @@
+     <Reference Include="Moq">
+       <HintPath>..\packages\Moq.4.0.10827\lib\NET40\Moq.dll</HintPath>
+     </Reference>
++    <Reference Include="Ninject">
++      <HintPath>..\packages\Ninject.3.0.1.10\lib\net45-full\Ninject.dll</HintPath>
++    </Reference>
+     <Reference Include="nunit.framework">
+       <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
+     </Reference>
+diff --git a/LegacyApp.Web.Tests/TripServiceTests.cs b/LegacyApp.Web.Tests/TripServiceTests.cs
+index 3c1c299..ed3f6c0 100644
+--- a/LegacyApp.Web.Tests/TripServiceTests.cs
++++ b/LegacyApp.Web.Tests/TripServiceTests.cs
+@@ -1,5 +1,6 @@
+-﻿using System.Collections.Generic;
++﻿using LegacyApp.Web.Infrastructure;
+ using LegacyApp.Web.Models;
++using Moq;
+ using NUnit.Framework;
+ using LegacyApp.Web.Services;
+ 
+@@ -8,19 +9,27 @@ namespace LegacyApp.Web.Tests
+     [TestFixture]
+     public class TripServiceTests
+     {
++        #region [ SetUp ]
+         private static readonly User Guest = null;
+         private static readonly User UnusedUser = null;
+         private static readonly User RegisteredUser = new User { Name = "Alice" };
+         private static readonly User AnotherUser = new User { Name = "Bob" };
+         private static readonly Trip ToBrazil = new Trip();
+         private static readonly Trip ToLondon = new Trip();
++
++        private Mock<ITripDao> tripDaoMock;
+         private TripService tripService;
+ 
+         [SetUp]
+         public void SetUpEachTest()
+         {
+-            tripService = new TestableTripService();
++            tripDaoMock = new Mock<ITripDao>();
++            tripDaoMock.DefaultValue = DefaultValue.Mock;
++
++            ServiceLocator.Instance.Rebind<ITripDao>().ToConstant(tripDaoMock.Object);
++            tripService = ServiceLocator.GetService<TripService>();
+         }
++        #endregion
+ 
+         [Test, ExpectedException(typeof (UserNotLoggedInException))]
+         public void ShouldThrowAnExceptionWhenNotLoggedIn()
+@@ -52,6 +61,9 @@ namespace LegacyApp.Web.Tests
+                 .FriendsWith(AnotherUser, RegisteredUser)
+                 .WithTrips(ToBrazil, ToLondon)
+                 .Build();
++            tripDaoMock
++                .Setup(o => o.FindTripsByUser(friend))
++                .Returns(friend.Trips);
+ 
+             // act
+             var friendTrips = tripService.GetTripsByUser(friend, RegisteredUser);
+@@ -59,13 +71,5 @@ namespace LegacyApp.Web.Tests
+             // assert
+             Assert.That(friendTrips.Count, Is.EqualTo(2));
+         }
+-
+-        private class TestableTripService : TripService
+-        {
+-            protected override List<Trip> TripsByUser(User user)
+-            {
+-                return user.Trips;
+-            }
+-        }
+     }
+ }
+\ No newline at end of file
+diff --git a/LegacyApp.Web/Infrastructure/ServiceLocator.cs b/LegacyApp.Web/Infrastructure/ServiceLocator.cs
+new file mode 100644
+index 0000000..0e10cf2
+--- /dev/null
++++ b/LegacyApp.Web/Infrastructure/ServiceLocator.cs
+@@ -0,0 +1,16 @@
++﻿using Ninject;
++
++namespace LegacyApp.Web.Infrastructure
++{
++    public static class ServiceLocator
++    {
++        private static readonly StandardKernel kernel = new StandardKernel();
++
++        public static IKernel Instance { get { return kernel; } }
++
++        public static T GetService<T>()
++        {
++            return kernel.Get<T>();
++        }
++    }
++}
+\ No newline at end of file
+diff --git a/LegacyApp.Web/LegacyApp.Web.csproj b/LegacyApp.Web/LegacyApp.Web.csproj
+index eeac61f..82720ad 100644
+--- a/LegacyApp.Web/LegacyApp.Web.csproj
++++ b/LegacyApp.Web/LegacyApp.Web.csproj
+@@ -116,9 +116,11 @@
+     <Compile Include="Global.asax.cs">
+       <DependentUpon>Global.asax</DependentUpon>
+     </Compile>
++    <Compile Include="Infrastructure\ServiceLocator.cs" />
+     <Compile Include="Models\Trip.cs" />
+     <Compile Include="Models\User.cs" />
+     <Compile Include="Properties\AssemblyInfo.cs" />
++    <Compile Include="Services\ITripDao.cs" />
+     <Compile Include="Services\TripDao.cs" />
+     <Compile Include="Services\TripService.cs" />
+     <Compile Include="Services\UserDao.cs" />
+diff --git a/LegacyApp.Web/Services/ITripDao.cs b/LegacyApp.Web/Services/ITripDao.cs
+new file mode 100644
+index 0000000..10fa77c
+--- /dev/null
++++ b/LegacyApp.Web/Services/ITripDao.cs
+@@ -0,0 +1,10 @@
++﻿using System.Collections.Generic;
++using LegacyApp.Web.Models;
++
++namespace LegacyApp.Web.Services
++{
++    public interface ITripDao
++    {
++        List<Trip> FindTripsByUser(User user);
++    }
++}
+\ No newline at end of file
+diff --git a/LegacyApp.Web/Services/TripDao.cs b/LegacyApp.Web/Services/TripDao.cs
+index 23b3568..8162f08 100644
+--- a/LegacyApp.Web/Services/TripDao.cs
++++ b/LegacyApp.Web/Services/TripDao.cs
+@@ -4,9 +4,9 @@ using LegacyApp.Web.Models;
+ 
+ namespace LegacyApp.Web.Services
+ {
+-    public class TripDao
++    public class TripDao : ITripDao
+     {
+-        public static List<Trip> FindTripsByUser(User user)
++        public List<Trip> FindTripsByUser(User user)
+         {
+             // SQL query here
+             throw new NotImplementedException();
+diff --git a/LegacyApp.Web/Services/TripService.cs b/LegacyApp.Web/Services/TripService.cs
+index a00ca9c..374dd2f 100644
+--- a/LegacyApp.Web/Services/TripService.cs
++++ b/LegacyApp.Web/Services/TripService.cs
+@@ -5,6 +5,16 @@ namespace LegacyApp.Web.Services
+ {
+     public class TripService
+     {
++        private readonly ITripDao tripDao;
++
++        // optional
++        public TripService() : this(new TripDao()) { }
++
++        public TripService(ITripDao tripDao)
++        {
++            this.tripDao = tripDao;
++        }
++
+         public List<Trip> GetTripsByUser(User user, User loggedInUser)
+         {
+             if (loggedInUser == null)
+@@ -15,9 +25,9 @@ namespace LegacyApp.Web.Services
+                 : NotTrips();
+         }
+ 
+-        protected virtual List<Trip> TripsByUser(User user)
++        private List<Trip> TripsByUser(User user)
+         {
+-            return TripDao.FindTripsByUser(user);
++            return tripDao.FindTripsByUser(user);
+         }
+ 
+         private List<Trip> NotTrips()
+diff --git a/ReadMe.md b/ReadMe.md
+index 492d81b..1ff0f63 100644
+--- a/ReadMe.md
++++ b/ReadMe.md
+@@ -62,6 +62,7 @@ Start testing from shortest do deepest branch
+  * Tip for Mac keyboard: Alt+Insert == fn + alt/option + return
+  * ShouldInformWhenUsersAre(Not)Friends
+  * Resharper: Ctrl+Alt+F -> file structure
++ * Resharper: Shift+Alt+Space -> Import symbol completion
+  * stay green all the time!
+  * bring variables together (near usage)
+  * guard clause to the top
+@@ -72,3 +73,9 @@ Start testing from shortest do deepest branch
+ ## What if desing is wrong?
+ 
+  * it has dependecy on web framework
++ * static call (and dependency on data source)
++ * test for retrieving trips from in memory db
++ * removing static method
++ * interface segregation
++ * service locator pattern and mocking dependecies
++ * get rid of Testable... (ugly) - protected virtual methods only for tests

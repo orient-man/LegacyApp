@@ -1,0 +1,62 @@
+diff --git a/LegacyApp.Web.Tests/TripServiceTests.cs b/LegacyApp.Web.Tests/TripServiceTests.cs
+index ed3f6c0..3f22f78 100644
+--- a/LegacyApp.Web.Tests/TripServiceTests.cs
++++ b/LegacyApp.Web.Tests/TripServiceTests.cs
+@@ -34,7 +34,7 @@ namespace LegacyApp.Web.Tests
+         [Test, ExpectedException(typeof (UserNotLoggedInException))]
+         public void ShouldThrowAnExceptionWhenNotLoggedIn()
+         {
+-            tripService.GetTripsByUser(UnusedUser, Guest);
++            tripService.GetFriendTrips(UnusedUser, Guest);
+         }
+ 
+         [Test]
+@@ -47,7 +47,7 @@ namespace LegacyApp.Web.Tests
+                 .Build();
+ 
+             // act
+-            var friendTrips = tripService.GetTripsByUser(friend, RegisteredUser);
++            var friendTrips = tripService.GetFriendTrips(friend, RegisteredUser);
+ 
+             // assert
+             Assert.That(friendTrips, Is.Empty);
+@@ -66,7 +66,7 @@ namespace LegacyApp.Web.Tests
+                 .Returns(friend.Trips);
+ 
+             // act
+-            var friendTrips = tripService.GetTripsByUser(friend, RegisteredUser);
++            var friendTrips = tripService.GetFriendTrips(friend, RegisteredUser);
+ 
+             // assert
+             Assert.That(friendTrips.Count, Is.EqualTo(2));
+diff --git a/LegacyApp.Web/Services/TripService.cs b/LegacyApp.Web/Services/TripService.cs
+index 374dd2f..28f7fe8 100644
+--- a/LegacyApp.Web/Services/TripService.cs
++++ b/LegacyApp.Web/Services/TripService.cs
+@@ -15,16 +15,21 @@ namespace LegacyApp.Web.Services
+             this.tripDao = tripDao;
+         }
+ 
+-        public List<Trip> GetTripsByUser(User user, User loggedInUser)
++        public List<Trip> GetFriendTrips(User friend, User loggedInUser)
+         {
+-            if (loggedInUser == null)
+-                throw new UserNotLoggedInException();
++            Validate(loggedInUser);
+ 
+-            return user.IsFriendWith(loggedInUser)
+-                ? TripsByUser(user)
++            return friend.IsFriendWith(loggedInUser)
++                ? TripsByUser(friend)
+                 : NotTrips();
+         }
+ 
++        private void Validate(User loggedInUser)
++        {
++            if (loggedInUser == null)
++                throw new UserNotLoggedInException();
++        }
++
+         private List<Trip> TripsByUser(User user)
+         {
+             return tripDao.FindTripsByUser(user);
