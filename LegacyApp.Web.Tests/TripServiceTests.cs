@@ -14,24 +14,18 @@ namespace LegacyApp.Web.Tests
         private static readonly User AnotherUser = new User { Name = "Bob" };
         private static readonly Trip ToBrazil = new Trip();
         private static readonly Trip ToLondon = new Trip();
-        private static User loggedInUser;
         private TripService tripService;
 
         [SetUp]
         public void SetUpEachTest()
         {
-            loggedInUser = RegisteredUser;
             tripService = new TestableTripService();
         }
 
         [Test, ExpectedException(typeof (UserNotLoggedInException))]
         public void ShouldThrowAnExceptionWhenNotLoggedIn()
         {
-            // arrange
-            loggedInUser = Guest;
-
-            // act
-            tripService.GetTripsByUser(UnusedUser);
+            tripService.GetTripsByUser(UnusedUser, Guest);
         }
 
         [Test]
@@ -44,7 +38,7 @@ namespace LegacyApp.Web.Tests
                 .Build();
 
             // act
-            var friendTrips = tripService.GetTripsByUser(friend);
+            var friendTrips = tripService.GetTripsByUser(friend, RegisteredUser);
 
             // assert
             Assert.That(friendTrips, Is.Empty);
@@ -55,12 +49,12 @@ namespace LegacyApp.Web.Tests
         {
             // arrange
             var friend = new UserBuilder()
-                .FriendsWith(AnotherUser, loggedInUser)
+                .FriendsWith(AnotherUser, RegisteredUser)
                 .WithTrips(ToBrazil, ToLondon)
                 .Build();
 
             // act
-            var friendTrips = tripService.GetTripsByUser(friend);
+            var friendTrips = tripService.GetTripsByUser(friend, RegisteredUser);
 
             // assert
             Assert.That(friendTrips.Count, Is.EqualTo(2));
@@ -68,11 +62,6 @@ namespace LegacyApp.Web.Tests
 
         private class TestableTripService : TripService
         {
-            protected override User GetLoggedInUser()
-            {
-                return loggedInUser;
-            }
-
             protected override List<Trip> TripsByUser(User user)
             {
                 return user.Trips;

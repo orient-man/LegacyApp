@@ -67,4 +67,8 @@ Start testing from shortest do deepest branch
  * guard clause to the top
  * get rid of variables (if you can) -> they make for complexity
  * code should be read top-down
+ * always baby steps - bit by bit
 
+## What if desing is wrong?
+
+ * it has dependecy on web framework
