@@ -83,12 +83,14 @@ Starting from the deepest branch to the shortest (different than testing)
  * Before: 9de60a2
  * it has dependecy on web framework
  * static call (and dependency on data source)
+ * Pit stop: 4288830
  * test for retrieving trips from in memory db
  * removing static method
  * interface segregation
  * service locator pattern and mocking dependecies
  * get rid of Testable... (ugly) - protected virtual methods only for tests
  * compare before and after - it could take 20 minutes (after some practice ;)
+ * After: 9ee00ec
 
 ## Craftsmen at work
 
