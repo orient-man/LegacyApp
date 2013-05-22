@@ -17,7 +17,7 @@ namespace LegacyApp.Web.Services
 
         protected virtual List<Trip> TripsByUser(User user)
         {
-            return TripDao.FindTripsByUser(user);
+            return TripDao.FindTripsByUserStatic(user);
         }
 
         private List<Trip> NotTrips()

@@ -119,6 +119,7 @@
     <Compile Include="Models\Trip.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\ITripDao.cs" />
     <Compile Include="Services\TripDao.cs" />
     <Compile Include="Services\TripService.cs" />
     <Compile Include="Services\UserDao.cs" />

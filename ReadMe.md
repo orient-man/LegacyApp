@@ -62,6 +62,7 @@ Start testing from shortest do deepest branch
  * Tip for Mac keyboard: Alt+Insert == fn + alt/option + return
  * ShouldInformWhenUsersAre(Not)Friends
  * Resharper: Ctrl+Alt+F -> file structure
+ * Resharper: Shift+Alt+Space -> Import symbol completion
  * stay green all the time!
  * bring variables together (near usage)
  * guard clause to the top
@@ -72,3 +73,7 @@ Start testing from shortest do deepest branch
 ## What if desing is wrong?
 
  * it has dependecy on web framework
+ * static call (and dependency on data source)
+ * test for retrieving trips from in memory db
+ * removing static method
+
