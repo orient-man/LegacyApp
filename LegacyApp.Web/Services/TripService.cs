@@ -10,22 +10,11 @@ namespace LegacyApp.Web.Services
         {
             var loggedInUser = GetLoggedInUser();
             if (loggedInUser == null)
-            {
                 throw new UserNotLoggedInException();
-            }
 
-            List<Trip> tripList = new List<Trip>();
-            if (user.IsFriendWith(loggedInUser))
-            {
-                tripList = TripsByUser(user);
-            }
-
-            return tripList;
-        }
-
-        protected virtual List<Trip> TripsByUser(User user)
-        {
-            return TripDao.FindTripsByUser(user);
+            return user.IsFriendWith(loggedInUser)
+                ? TripsByUser(user)
+                : NotTrips();
         }
 
         protected virtual User GetLoggedInUser()
@@ -37,6 +26,16 @@ namespace LegacyApp.Web.Services
                     HttpContext.Current.User.Identity.Name);
             }
             return loggedUser;
+        }
+
+        protected virtual List<Trip> TripsByUser(User user)
+        {
+            return TripDao.FindTripsByUser(user);
+        }
+
+        private List<Trip> NotTrips()
+        {
+            return new List<Trip>();
         }
     }
 }

@@ -60,8 +60,11 @@ Start testing from shortest do deepest branch
  * method does too much (feature envy)
  * Single Responsibility Principle!
  * Tip for Mac keyboard: Alt+Insert == fn + alt/option + return
- * ShouldInformWhenUsersAreNotFriends
+ * ShouldInformWhenUsersAre(Not)Friends
  * Resharper: Ctrl+Alt+F -> file structure
  * stay green all the time!
  * bring variables together (near usage)
+ * guard clause to the top
+ * get rid of variables (if you can) -> they make for complexity
+ * code should be read top-down
 
