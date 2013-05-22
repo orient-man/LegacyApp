@@ -6,6 +6,11 @@ namespace LegacyApp.Web.Tests
     {
         private readonly User user = new User();
 
+        public UserBuilder()
+        {
+            user.Name = new object().GetHashCode().ToString();
+        }
+
         public UserBuilder FriendsWith(params User[] friends)
         {
             user.Friends.AddRange(friends);
