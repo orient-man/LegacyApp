@@ -9,21 +9,11 @@ namespace LegacyApp.Web.Services
         public List<Trip> GetTripsByUser(User user)
         {
             List<Trip> tripList = new List<Trip>();
-            bool isFriend = false;
 
-            var loggedUser = GetLoggedInUser();
-            if (loggedUser != null)
+            var loggedInUser = GetLoggedInUser();
+            if (loggedInUser != null)
             {
-                foreach (User friend in user.Friends)
-                {
-                    if (friend.Equals(loggedUser))
-                    {
-                        isFriend = true;
-                        break;
-                    }
-                }
-
-                if (isFriend)
+                if (user.IsFriendWith(loggedInUser))
                 {
                     tripList = TripsByUser(user);
                 }

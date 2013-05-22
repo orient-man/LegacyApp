@@ -62,4 +62,6 @@ Start testing from shortest do deepest branch
  * Tip for Mac keyboard: Alt+Insert == fn + alt/option + return
  * ShouldInformWhenUsersAreNotFriends
  * Resharper: Ctrl+Alt+F -> file structure
+ * stay green all the time!
+ * bring variables together (near usage)
 
