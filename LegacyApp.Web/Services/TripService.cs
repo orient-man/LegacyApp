@@ -8,11 +8,10 @@ namespace LegacyApp.Web.Services
     {
         public List<Trip> GetTripsByUser(User user)
         {
-            var loggedInUser = GetLoggedInUser();
-            if (loggedInUser == null)
+            if (GetLoggedInUser() == null)
                 throw new UserNotLoggedInException();
 
-            return user.IsFriendWith(loggedInUser)
+            return user.IsFriendWith(GetLoggedInUser())
                 ? TripsByUser(user)
                 : NotTrips();
         }
