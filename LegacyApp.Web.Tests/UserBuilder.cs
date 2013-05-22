@@ -8,7 +8,13 @@ namespace LegacyApp.Web.Tests
 
         public UserBuilder()
         {
-            user.Name = new object().GetHashCode().ToString();
+            Named(new object().GetHashCode().ToString());
+        }
+
+        public UserBuilder Named(string name)
+        {
+            user.Name = name;
+            return this;
         }
 
         public UserBuilder FriendsWith(params User[] friends)

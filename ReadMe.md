@@ -53,3 +53,13 @@ Start testing from shortest do deepest branch
  * another example of seam: escaping singleton, static calls and object creation
  * 100% coverage except seams (dependecies)
  * builders (when we need to build rich object graph)
+
+## Refactoring begins
+
+ * Starting from the deepest branch to the shortest (different than testing)
+ * method does too much (feature envy)
+ * Single Responsibility Principle!
+ * Tip for Mac keyboard: Alt+Insert == fn + alt/option + return
+ * ShouldInformWhenUsersAreNotFriends
+ * Resharper: Ctrl+Alt+F -> file structure
+

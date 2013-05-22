@@ -17,6 +17,11 @@ namespace LegacyApp.Web.Models
             Trips = new List<Trip>();
         }
 
+        public bool IsFriendWith(User user)
+        {
+            return Friends.Contains(user);
+        }
+
         public override bool Equals(object obj)
         {
             return obj != null && Equals(obj as User);
