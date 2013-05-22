@@ -15,13 +15,13 @@ namespace LegacyApp.Web.Services
             this.tripDao = tripDao;
         }
 
-        public List<Trip> GetTripsByUser(User user, User loggedInUser)
+        public List<Trip> GetFriendTrips(User friend, User loggedInUser)
         {
             if (loggedInUser == null)
                 throw new UserNotLoggedInException();
 
-            return user.IsFriendWith(loggedInUser)
-                ? TripsByUser(user)
+            return friend.IsFriendWith(loggedInUser)
+                ? TripsByUser(friend)
                 : NotTrips();
         }
 

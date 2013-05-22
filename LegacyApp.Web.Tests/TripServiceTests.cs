@@ -34,7 +34,7 @@ namespace LegacyApp.Web.Tests
         [Test, ExpectedException(typeof (UserNotLoggedInException))]
         public void ShouldThrowAnExceptionWhenNotLoggedIn()
         {
-            tripService.GetTripsByUser(UnusedUser, Guest);
+            tripService.GetFriendTrips(UnusedUser, Guest);
         }
 
         [Test]
@@ -47,7 +47,7 @@ namespace LegacyApp.Web.Tests
                 .Build();
 
             // act
-            var friendTrips = tripService.GetTripsByUser(friend, RegisteredUser);
+            var friendTrips = tripService.GetFriendTrips(friend, RegisteredUser);
 
             // assert
             Assert.That(friendTrips, Is.Empty);
@@ -66,7 +66,7 @@ namespace LegacyApp.Web.Tests
                 .Returns(friend.Trips);
 
             // act
-            var friendTrips = tripService.GetTripsByUser(friend, RegisteredUser);
+            var friendTrips = tripService.GetFriendTrips(friend, RegisteredUser);
 
             // assert
             Assert.That(friendTrips.Count, Is.EqualTo(2));
