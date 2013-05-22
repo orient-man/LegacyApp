@@ -76,4 +76,6 @@ Start testing from shortest do deepest branch
  * static call (and dependency on data source)
  * test for retrieving trips from in memory db
  * removing static method
-
+ * interface segregation
+ * service locator pattern and mocking dependecies
+ * get rid of Testable... (ugly) - protected virtual methods only for tests
