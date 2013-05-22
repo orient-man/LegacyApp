@@ -8,19 +8,16 @@ namespace LegacyApp.Web.Services
     {
         public List<Trip> GetTripsByUser(User user)
         {
-            List<Trip> tripList = new List<Trip>();
-
             var loggedInUser = GetLoggedInUser();
-            if (loggedInUser != null)
-            {
-                if (user.IsFriendWith(loggedInUser))
-                {
-                    tripList = TripsByUser(user);
-                }
-            }
-            else
+            if (loggedInUser == null)
             {
                 throw new UserNotLoggedInException();
+            }
+
+            List<Trip> tripList = new List<Trip>();
+            if (user.IsFriendWith(loggedInUser))
+            {
+                tripList = TripsByUser(user);
             }
 
             return tripList;
