@@ -24,7 +24,7 @@ Start testing from shortest do deepest branch
 
     git clone https://github.com/orient-man/LegacyApp.git
     cd LegacyApp
-    git checkout b50ad0d
+    git checkout 0f05084
 
 ## Requirements
 
@@ -42,34 +42,34 @@ Start testing from shortest do deepest branch
 
 ## First test for shortest branch
 
- * Before: b50ad0d
+ * Before: 0f05084
  * ShouldThrowAnExceptionWhenNotLoggedIn
  * Ctrl-Shift-R / Ctrl-R Ctrl-M - Extract Method "GetLoggedInUser"
  * introducing a seam into the code (to avoid HttpContext)
  * code coverage shows if test covers the branch I wanted
  * refactoring test
- * After: 62af89f
+ * After: b20759c
 
 ## Next: "ShouldNotReturnAnyTripsWhenUsersAreNotFriends"
 
- * Before: 62af89f
- * After: 21b7618
+ * Before: b20759c
+ * After: 1613b68
 
 ## Next: "ShouldReturnFriendTripsWhenUsersAreFriends"
 
- * Before: 21b7618
+ * Before: 1613b68
  * PLEASE DO NOT COPY-AND-PASTE NEVER EVER ;-)
  * avoid going to database (TripDao)
  * another example of seam: escaping singleton, static calls and object creation
  * 100% coverage except seams (dependecies)
  * builders (when we need to build rich object graph)
- * After: be36f04
+ * After: ca5a502
 
 ## Refactoring begins
 
 Starting from the deepest branch to the shortest (different than testing)
 
- * Before: be36f04
+ * Before: ca5a502
  * method does too much (feature envy)
  * Single Responsibility Principle!
  * Tip for Mac keyboard: Alt+Insert == fn + alt/option + return
@@ -77,27 +77,27 @@ Starting from the deepest branch to the shortest (different than testing)
  * Resharper: Ctrl+Alt+F -> file structure
  * Resharper: Shift+Alt+Space -> Import symbol completion
  * stay green all the time!
- * Pit stop: 2023d49
+ * Pit stop: e36719c
  * bring variables together (near usage)
  * guard clause to the top
  * get rid of variables (if you can) -> they make for complexity
  * code should be read top-down
  * always baby steps - bit by bit
- * After: 9413a24
+ * After: 8f7dfed
 
 ## What if desing is wrong?
 
- * Before: 9413a24
+ * Before: 8f7dfed
  * it has dependecy on web framework
  * static call (and dependency on data source)
- * Pit stop: 51b12ef
+ * Pit stop: 97510e2
  * test for retrieving trips from in memory db
  * removing static method
  * interface segregation
  * service locator pattern and mocking dependecies
  * get rid of Testable... (ugly) - protected virtual methods only for tests
  * compare before and after - it could take 20 minutes (after some practice ;)
- * After: d4848c8
+ * After: 3c5b397
 
 ## Craftsmen at work
 
