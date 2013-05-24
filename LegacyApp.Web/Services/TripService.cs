@@ -21,7 +21,7 @@ namespace LegacyApp.Web.Services
 
             return friend.IsFriendWith(loggedInUser)
                 ? TripsByUser(friend)
-                : NotTrips();
+                : NoTrips();
         }
 
         private void Validate(User loggedInUser)
@@ -35,7 +35,7 @@ namespace LegacyApp.Web.Services
             return tripDao.FindTripsByUser(user);
         }
 
-        private List<Trip> NotTrips()
+        private List<Trip> NoTrips()
         {
             return new List<Trip>();
         }
