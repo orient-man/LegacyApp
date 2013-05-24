@@ -1,8 +1,8 @@
 ﻿using LegacyApp.Web.Infrastructure;
 using LegacyApp.Web.Models;
+using LegacyApp.Web.Services;
 using Moq;
 using NUnit.Framework;
-using LegacyApp.Web.Services;
 
 namespace LegacyApp.Web.Tests
 {
@@ -17,21 +17,19 @@ namespace LegacyApp.Web.Tests
         private static readonly Trip ToBrazil = new Trip();
         private static readonly Trip ToLondon = new Trip();
 
-        private Mock<ITripDao> tripDaoMock;
+        private ITripDao tripDao;
         private TripService tripService;
 
         [SetUp]
         public void SetUpEachTest()
         {
-            tripDaoMock = new Mock<ITripDao>();
-            tripDaoMock.DefaultValue = DefaultValue.Mock;
-
-            ServiceLocator.Instance.Rebind<ITripDao>().ToConstant(tripDaoMock.Object);
+            tripDao = new Mock<ITripDao> { DefaultValue = DefaultValue.Mock }.Object;
+            ServiceLocator.Instance.Rebind<ITripDao>().ToConstant(tripDao);
             tripService = ServiceLocator.GetService<TripService>();
         }
         #endregion
 
-        [Test, ExpectedException(typeof (UserNotLoggedInException))]
+        [Test, ExpectedException(typeof(UserNotLoggedInException))]
         public void ShouldThrowAnExceptionWhenNotLoggedIn()
         {
             tripService.GetFriendTrips(UnusedUser, Guest);
@@ -61,7 +59,7 @@ namespace LegacyApp.Web.Tests
                 .FriendsWith(AnotherUser, RegisteredUser)
                 .WithTrips(ToBrazil, ToLondon)
                 .Build();
-            tripDaoMock
+            Mock.Get(tripDao)
                 .Setup(o => o.FindTripsByUser(friend))
                 .Returns(friend.Trips);
 
