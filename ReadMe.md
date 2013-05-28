@@ -65,6 +65,29 @@ Start testing from shortest do deepest branch
  * builders (when we need to build rich object graph)
  * After: ca5a502
 
+## Refactoring - Why?
+
+As a code-base grows...
+
+ * Understanding decreases
+ * Impact on change increases
+ * Costs increase
+
+Refactoring helps
+
+ * Clean up code
+ * Improve understanding
+ * Minimize impacts of change
+ * Increase Maintainability
+ * Reduce Costs
+
+## Refactoring - Process
+
+ * Identify Code Smells
+ * Perform Impact Analysis
+ * Write a Unit Test (sometimes an Integration Test - better than nothing)
+ * Refactor
+
 ## Refactoring begins
 
 Starting from the deepest branch to the shortest (different than testing)
