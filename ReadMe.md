@@ -29,7 +29,7 @@ Start testing from shortest do deepest branch
 ## Requirements
 
  * Visual Studio 2010/2012 (better Prof. but Express - free edition - is good enough)
-  - should compile without VS (.NET 4.0 required)[^fixfornet40]
+  - should compile without VS (with .NET 4.5 OOTB, for 4.0 try  `git cherry-pick f5db872`)
  * one of many NUnit test runners (NUnit standalone, NCrunch, TestDriven.NET, Mighty-Moose,
    VS2012 built-in + NUnit adapter, R#...)
 
@@ -158,4 +158,3 @@ Starting from the deepest branch to the shortest (different than testing)
  * [Google C++ Testing Framework](https://code.google.com/p/googletest/)
  * [Google Test (GTest) setup with Microsoft Visual Studio for C++ unit testing](http://leefrancis.org/2010/11/17/google-test-gtest-setup-with-microsoft-visual-studio-2008-c/)
 
- [^fixfornet40]: If doesn't work try `git cherry-pick f5db872`
